@@ -3,286 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShinHan 國畫顏料色卡表 - 響應式雙欄版</title>
+    <title>ShinHan 專家國畫顏料 - 完整色卡系統</title>
     <style>
-        /* --- CSS Reset & Variables --- */
         :root {
-            --bg-color: #f0f2f5;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666;
-            --accent-color: #333;
-            --container-width: 1280px; 
-            --card-width: 400px; 
-            --gap-size: 20px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            /* --- [關鍵設定] 雪碧圖參數 (ShinHan) --- */
+            --sprite-cols: 3;    /* 橫向 3 格 */
+            --sprite-rows: 7;    /* 縱向 7 格 */
+            
+            /* --- 卡片視覺設定 --- */
+            --bg-color: #f4f7f6;
+            --primary-color: #2c3e50;
+            --card-radius: 12px;
+            --swatch-ratio: 4 / 1; /* 維持 ShinHan 色塊寬扁比例 (400x100) */
+            --zoom-tolerance: 1.02; /* 2% 放大容錯，消除白邊 */
         }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
         }
 
-        /* --- Header Section --- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- Header --- */
         header {
-            width: 100%;
-            max-width: var(--container-width);
-            margin-bottom: 30px;
-            background: #ffffff;
-            padding: 24px 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
         h1 {
             font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--text-primary);
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        
+        p {
+            color: #7f8c8d;
             margin: 0;
         }
 
         .search-wrapper {
             position: relative;
-            width: 100%;
-            max-width: 400px;
+            max-width: 600px;
+            margin: 25px auto 0;
         }
 
-        .search-input {
+        #searchInput {
             width: 100%;
-            padding: 12px 16px;
-            padding-left: 44px;
-            border: 2px solid #eaecf0;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 15px 25px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
             outline: none;
-            transition: all 0.2s ease;
-            background-color: #fff;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background: #fafafa;
         }
 
-        .search-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            border: 2px solid #98a2b3;
-            border-radius: 50%;
-        }
-        .search-icon::after {
-            content: '';
-            position: absolute;
-            top: 11px;
-            left: 11px;
-            width: 6px;
-            height: 2px;
-            background: #98a2b3;
-            transform: rotate(45deg);
+        #searchInput:focus {
+            border-color: #3498db;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
         }
 
         /* --- Grid Layout --- */
-        main {
-            width: 100%;
-            max-width: var(--container-width);
-        }
-
         .color-grid {
             display: grid;
-            /* 預設桌面版：3欄固定寬度 */
-            grid-template-columns: repeat(3, var(--card-width)); 
-            gap: var(--gap-size);
-            justify-content: center;
+            /* 電腦版：自動填滿，每張卡片最小 280px (確保寬扁色塊好看) */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
-        /* --- Color Card Component --- */
-        .color-card {
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        /* --- Card Component --- */
+        .card {
+            background: white;
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
-            flex-direction: column; 
-            /* 讓卡片在Grid中自動填滿高度，確保同一列卡片等高 */
-            height: 100%;
+            flex-direction: column;
         }
 
-        .color-card:hover {
-            transform: translateY(-4px);
+        .card:hover {
+            transform: translateY(-5px);
             box-shadow: 0 12px 24px rgba(0,0,0,0.12);
         }
 
-        /* 上半部：雪碧圖顯示區 (核心修改) */
-        .card-visual {
+        /* --- Swatch (Visual) --- */
+        .swatch {
             width: 100%;
-            /* 使用 aspect-ratio 鎖定 4:1 比例 (400px:100px) */
-            aspect-ratio: 4 / 1; 
+            aspect-ratio: var(--swatch-ratio); /* 鎖定 4:1 比例 */
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #eee;
+            background-color: #eee; /* Loading placeholder */
+        }
+
+        /* 使用偽元素顯示圖片，支援 CSS Variable 定位 */
+        .swatch::before {
+            content: '';
+            position: absolute;
+            top: 0; 
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-image: url('新韓 國畫顏料.jpg');
             background-repeat: no-repeat;
             
-            /* 雪碧圖總寬是單格的3倍，總高是單格的7倍。
-               設定百分比後，無論容器寬度為何，圖片都會等比例縮放。
-            */
-            background-size: 300% 700%; 
-            border-bottom: 1px solid #f0f0f0;
-
-            /* 2% 放大容錯，解決白邊問題 */
-            transform: scale(1.02);
+            /* 雪碧圖尺寸計算：Grid Cols * 100%, Grid Rows * 100% */
+            background-size: calc(var(--sprite-cols) * 100%) calc(var(--sprite-rows) * 100%);
+            
+            /* 由 JS 傳入的變數控制位置 */
+            background-position: var(--bg-x) var(--bg-y);
+            
+            /* 放大容錯與中心點 */
+            transform: scale(var(--zoom-tolerance));
             transform-origin: center center;
         }
 
-        /* 下半部：資料顯示區 */
-        .card-info {
-            padding: 16px 20px;
+        /* --- Info Section --- */
+        .info {
+            padding: 16px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            position: relative; 
-            z-index: 2;
-            background: #fff;
-            flex-grow: 1; /* 確保文字少時下方空間填滿 */
+            justify-content: space-between;
         }
 
-        .info-header {
+        .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 8px;
         }
 
         .color-id {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: var(--text-primary);
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #2c3e50;
             letter-spacing: -0.5px;
         }
 
-        .color-group {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #444;
-            background: #eaecf0;
+        .group-badge {
+            font-size: 0.75em;
+            background: #ecf0f1;
             padding: 4px 8px;
             border-radius: 6px;
+            color: #7f8c8d;
+            font-weight: 700;
             text-transform: uppercase;
-            white-space: nowrap; /* 防止群組名稱換行 */
         }
 
-        .info-names {
+        .name-container {
             display: flex;
             flex-direction: column;
         }
 
-        .color-name-zh {
-            font-size: 1.1rem;
+        .name-en {
             font-weight: 700;
-            color: #333;
+            font-size: 1.1em;
+            color: #34495e;
             margin-bottom: 2px;
+            line-height: 1.2;
         }
 
-        .color-name-en {
-            font-size: 0.9rem;
-            color: #666;
+        .name-zh {
+            font-size: 1em;
+            color: #95a5a6;
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
             font-weight: 500;
-            text-transform: uppercase;
         }
 
-        /* --- Utility --- */
-        .no-results {
+        .no-result {
             grid-column: 1 / -1;
-            padding: 80px;
             text-align: center;
-            background: #fff;
-            border-radius: 12px;
-            color: #666;
-            font-size: 1.2rem;
+            padding: 60px;
+            color: #bdc3c7;
+            font-size: 1.2em;
         }
 
-        /* --- Responsive Design (Mobile Optimization) --- */
-        /* 當寬度小於 900px 時 (涵蓋平板與手機) */
-        @media (max-width: 900px) {
-            body {
-                padding: 20px 10px; /* 減少外部間距 */
-            }
-
-            header {
-                padding: 16px;
+        /* --- Mobile Responsive (< 768px) --- */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            header { 
+                padding: 20px 15px; 
                 margin-bottom: 20px;
             }
-
-            h1 {
-                font-size: 1.4rem;
-            }
             
-            .search-wrapper {
-                max-width: 100%; /* 搜尋框滿寬 */
-            }
+            h1 { font-size: 1.4rem; }
 
-            /* --- 手機版雙欄核心設定 --- */
             .color-grid {
-                /* 強制改為 2 欄，比例 1:1，自動填滿 */
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 10px; /* 縮小卡片間距 */
+                /* 手機版強制 2 欄，間距縮小 */
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
 
-            .card-info {
-                padding: 10px 12px; /* 縮小內部間距 */
-                gap: 4px;
-            }
-
-            .color-id {
-                font-size: 1.1rem; /* 縮小編號字體 */
-            }
-
-            .color-group {
-                font-size: 0.65rem;
-                padding: 2px 6px;
-            }
-
-            .color-name-zh {
-                font-size: 1rem;
-            }
-
-            .color-name-en {
-                font-size: 0.75rem;
-            }
+            .info { padding: 12px; }
+            .color-id { font-size: 1.2em; }
+            .group-badge { font-size: 0.65em; padding: 2px 6px; }
+            .name-en { font-size: 0.95em; }
+            .name-zh { font-size: 0.85em; }
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
         <h1>ShinHan 專家國畫顏料</h1>
+        <p>完整色號資料庫</p>
         <div class="search-wrapper">
-            <div class="search-icon"></div>
-            <input type="text" id="searchInput" class="search-input" placeholder="搜尋編號、名稱...">
+            <input type="text" id="searchInput" placeholder="搜尋色號 (314)、名稱 (Crimson) 或中文 (臙脂)...">
         </div>
     </header>
 
-    <main>
-        <div id="colorGrid" class="color-grid">
-            </div>
-    </main>
+    <main id="gridContainer" class="color-grid"></main>
+</div>
 
 <script>
+    // Config: 依照 ShinHan 圖片設定
+    const SPRITE_COLS = 3;
+    const SPRITE_ROWS = 7;
+
+    // Data Source
     const colorData = [
         // 第一排 (Row 0)
         { id: '314', en: 'CRIMSON 1', zh: '臙脂', group: 'C', spriteIndex: 0 },
@@ -313,86 +268,76 @@
         { id: '327', en: 'VIOLET', zh: '青紫', group: 'D', spriteIndex: 19 }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const gridContainer = document.getElementById('colorGrid');
-        const searchInput = document.getElementById('searchInput');
+    const gridContainer = document.getElementById('gridContainer');
+    const searchInput = document.getElementById('searchInput');
 
-        // Sprite Config
-        // 總共 3 欄 (Columns) 和 7 列 (Rows)
-        const TOTAL_COLS = 3;
-        const TOTAL_ROWS = 7;
+    // Helper: Compute Sprite CSS Variables
+    // 這裡我們將 JS 計算邏輯轉換為 CSS Variable，讓 ::before 使用
+    const getSpriteStyle = (index) => {
+        const row = Math.floor(index / SPRITE_COLS);
+        const col = index % SPRITE_COLS;
+        
+        // CSS Sprite Percentage Formula
+        const xPos = (col / (SPRITE_COLS - 1)) * 100;
+        const yPos = (row / (SPRITE_ROWS - 1)) * 100;
 
-        if (!gridContainer || !searchInput) return;
+        return `--bg-x: ${xPos}%; --bg-y: ${yPos}%;`;
+    };
 
-        /**
-         * 計算背景位置 (百分比模式)
-         * 這種算法可以適應任何尺寸的卡片寬度 (Responsive)
-         */
-        const getBackgroundPosition = (index) => {
-            const row = Math.floor(index / TOTAL_COLS);
-            const col = index % TOTAL_COLS;
-            
-            // 計算百分比座標
-            // X: col / (總欄數 - 1) * 100%
-            // Y: row / (總列數 - 1) * 100%
-            const x = (col / (TOTAL_COLS - 1)) * 100;
-            const y = (row / (TOTAL_ROWS - 1)) * 100;
-            
-            return `${x}% ${y}%`;
-        };
+    // Helper: Escape HTML to prevent XSS
+    const escapeHTML = (str) => str.replace(/[&<>"']/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]));
 
-        const renderList = (list) => {
-            if (list.length === 0) {
-                gridContainer.innerHTML = `
-                    <div class="no-results">
-                        沒有找到符合 "${searchInput.value}" 的顏料
-                    </div>`;
-                return;
-            }
+    // Render Logic
+    const renderList = (data) => {
+        if (!gridContainer) return;
 
-            const fragment = document.createDocumentFragment();
+        gridContainer.innerHTML = '';
 
-            list.forEach(color => {
-                const bgPos = getBackgroundPosition(color.spriteIndex);
-                
-                const card = document.createElement('article');
-                card.className = 'color-card';
-                
-                card.innerHTML = `
-                    <div class="card-visual" style="background-position: ${bgPos};" title="${color.zh}"></div>
-                    <div class="card-info">
-                        <div class="info-header">
-                            <span class="color-id">${color.id}</span>
-                            <span class="color-group">${color.group}</span>
-                        </div>
-                        <div class="info-names">
-                            <div class="color-name-zh">${color.zh}</div>
-                            <div class="color-name-en">${color.en}</div>
-                        </div>
+        if (data.length === 0) {
+            gridContainer.innerHTML = '<div class="no-result">沒有找到符合的顏料</div>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        data.forEach(color => {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            // 將計算好的 CSS 變數應用在 swatch 上，讓 CSS ::before 讀取
+            card.innerHTML = `
+                <div class="swatch" style="${getSpriteStyle(color.spriteIndex)}"></div>
+                <div class="info">
+                    <div class="header-row">
+                        <span class="color-id">${escapeHTML(color.id)}</span>
+                        <span class="group-badge">Group ${escapeHTML(color.group)}</span>
                     </div>
-                `;
-                
-                fragment.appendChild(card);
-            });
+                    <div class="name-container">
+                        <div class="name-en">${escapeHTML(color.en)}</div>
+                        <div class="name-zh">${escapeHTML(color.zh)}</div>
+                    </div>
+                </div>
+            `;
+            fragment.appendChild(card);
+        });
 
-            gridContainer.innerHTML = '';
-            gridContainer.appendChild(fragment);
-        };
+        gridContainer.appendChild(fragment);
+    };
 
-        const handleSearch = (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            
-            const filtered = colorData.filter(item => {
-                return (
-                    item.id.includes(query) || 
-                    item.en.toLowerCase().includes(query) || 
-                    item.zh.includes(query)
-                );
-            });
+    // Search Handler
+    const handleSearch = (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const filtered = colorData.filter(item => 
+            item.id.includes(query) || 
+            item.en.toLowerCase().includes(query) || 
+            item.zh.includes(query)
+        );
+        renderList(filtered);
+    };
 
-            renderList(filtered);
-        };
-
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
         renderList(colorData);
         searchInput.addEventListener('input', handleSearch);
     });
