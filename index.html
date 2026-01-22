@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShinHan 國畫顏料色卡表 - 垂直卡片版 (含容錯優化)</title>
+    <style>
+        /* --- CSS Reset & Variables --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --accent-color: #333;
+            --container-width: 1280px; 
+            --card-width: 400px; 
+            --img-height: 100px;
+            --gap-size: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Header Section --- */
+        header {
+            width: 100%;
+            max-width: var(--container-width);
+            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 24px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            padding-left: 44px;
+            border: 2px solid #eaecf0;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #fff;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: 2px solid #98a2b3;
+            border-radius: 50%;
+        }
+        .search-icon::after {
+            content: '';
+            position: absolute;
+            top: 11px;
+            left: 11px;
+            width: 6px;
+            height: 2px;
+            background: #98a2b3;
+            transform: rotate(45deg);
+        }
+
+        /* --- Grid Layout --- */
+        main {
+            width: 100%;
+            max-width: var(--container-width);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, var(--card-width)); 
+            gap: var(--gap-size);
+            justify-content: center;
+        }
+
+        /* --- Color Card Component (Vertical) --- */
+        .color-card {
+            background: #ffffff;
+            border-radius: 12px;
+            /* 關鍵：因為子元素放大了，必須透過 overflow: hidden 來裁切多餘邊緣 */
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column; 
+        }
+
+        .color-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+
+        /* 上半部：雪碧圖顯示區 */
+        .card-visual {
+            width: 100%;
+            height: var(--img-height);
+            background-image: url('新韓 國畫顏料.jpg');
+            background-repeat: no-repeat;
+            border-bottom: 1px solid #f0f0f0;
+
+            /* --- 核心修改：2% 放大容錯 --- */
+            /* 使用 transform: scale(1.02) 是處理雪碧圖公差最高效的方法，
+               它不會破壞 background-position 的像素計算邏輯，
+               但能有效裁切掉圖片四周 1% 的潛在白邊或鄰近色塊。 */
+            transform: scale(1.02);
+            transform-origin: center center;
+        }
+
+        /* 下半部：資料顯示區 */
+        .card-info {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            /* 確保內容層級在背景之上（雖然這裡是垂直排列，預防性設置） */
+            position: relative; 
+            z-index: 2;
+            background: #fff;
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .color-id {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .color-group {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #444;
+            background: #eaecf0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .info-names {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .color-name-zh {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .color-name-en {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        /* --- Utility & Responsive --- */
+        .no-results {
+            grid-column: 1 / -1;
+            padding: 80px;
+            text-align: center;
+            background: #fff;
+            border-radius: 12px;
+            color: #666;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 1300px) {
+            .color-grid {
+                grid-template-columns: repeat(auto-fit, var(--card-width));
+            }
+        }
+
+        @media (max-width: 450px) {
+            :root {
+                --card-width: 100%; 
+            }
+            .color-card {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ShinHan 專家國畫顏料</h1>
+        <div class="search-wrapper">
+            <div class="search-icon"></div>
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入編號、名稱搜尋...">
+        </div>
+    </header>
+
+    <main>
+        <div id="colorGrid" class="color-grid">
+            </div>
+    </main>
+
+<script>
+    const colorData = [
+        // 第一排 (Row 0)
+        { id: '314', en: 'CRIMSON 1', zh: '臙脂', group: 'C', spriteIndex: 0 },
+        { id: '306', en: 'GREEN LIGHT', zh: '若葉', group: 'B', spriteIndex: 1 },
+        { id: '328', en: 'RED VIOLET', zh: '牡丹', group: 'D', spriteIndex: 2 },
+        // 第二排 (Row 1)
+        { id: '309', en: 'CRIMSON 2', zh: '臙脂', group: 'C', spriteIndex: 3 },
+        { id: '316', en: 'DARK GREEN', zh: '綠草', group: 'B', spriteIndex: 4 },
+        { id: '304', en: 'YELLOW OCHRE', zh: '黃土', group: 'B', spriteIndex: 5 },
+        // 第三排 (Row 2)
+        { id: '339', en: 'CARMINE', zh: '洋紅', group: 'C', spriteIndex: 6 },
+        { id: '307', en: 'ICE GREEN', zh: '綠青', group: 'B', spriteIndex: 7 },
+        { id: '303', en: 'BURNT SIENNA', zh: '岱赭', group: 'B', spriteIndex: 8 },
+        // 第四排 (Row 3)
+        { id: '310', en: 'RED', zh: '洋紅', group: 'A', spriteIndex: 9 },
+        { id: '315', en: 'LIGHT BLUE VIOLET', zh: '群白', group: 'A', spriteIndex: 10 },
+        { id: '302', en: 'BLACK 1', zh: '黑', group: 'B', spriteIndex: 11 },
+        // 第五排 (Row 4)
+        { id: '311', en: 'VERMILION', zh: '朱紅', group: 'C', spriteIndex: 12 },
+        { id: '312', en: 'ULTRAMARINE BLUE', zh: '群青', group: 'C', spriteIndex: 13 },
+        { id: '301', en: 'WHITE', zh: '胡粉', group: 'A', spriteIndex: 14 },
+        // 第六排 (Row 5)
+        { id: '305', en: 'YELLOW LIGHT', zh: '黃', group: 'B', spriteIndex: 15 },
+        { id: '313', en: 'PRUSSIAN BLUE', zh: '紺', group: 'A', spriteIndex: 16 },
+        { id: '350', en: 'GOLD', zh: '金', group: 'B', spriteIndex: 17 },
+        // 第七排 (Row 6)
+        { id: '308', en: 'OPAL GREEN', zh: '白綠', group: 'B', spriteIndex: 18 },
+        { id: '327', en: 'VIOLET', zh: '青紫', group: 'D', spriteIndex: 19 }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const gridContainer = document.getElementById('colorGrid');
+        const searchInput = document.getElementById('searchInput');
+
+        // Sprite Constants
+        const COLS_PER_ROW = 3;
+        const ITEM_WIDTH = 400; // px
+        const ITEM_HEIGHT = 100; // px
+
+        if (!gridContainer || !searchInput) return;
+
+        const getBackgroundPosition = (index) => {
+            const row = Math.floor(index / COLS_PER_ROW);
+            const col = index % COLS_PER_ROW;
+            const x = -(col * ITEM_WIDTH);
+            const y = -(row * ITEM_HEIGHT);
+            return `${x}px ${y}px`;
+        };
+
+        const renderList = (list) => {
+            if (list.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="no-results">
+                        沒有找到符合 "${searchInput.value}" 的顏料
+                    </div>`;
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            list.forEach(color => {
+                const bgPos = getBackgroundPosition(color.spriteIndex);
+                
+                const card = document.createElement('article');
+                card.className = 'color-card';
+                
+                card.innerHTML = `
+                    <div class="card-visual" style="background-position: ${bgPos};" title="${color.zh} 預覽"></div>
+                    <div class="card-info">
+                        <div class="info-header">
+                            <span class="color-id">${color.id}</span>
+                            <span class="color-group">Group ${color.group}</span>
+                        </div>
+                        <div class="info-names">
+                            <div class="color-name-zh">${color.zh}</div>
+                            <div class="color-name-en">${color.en}</div>
+                        </div>
+                    </div>
+                `;
+                
+                fragment.appendChild(card);
+            });
+
+            gridContainer.innerHTML = '';
+            gridContainer.appendChild(fragment);
+        };
+
+        const handleSearch = (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            const filtered = colorData.filter(item => {
+                return (
+                    item.id.includes(query) || 
+                    item.en.toLowerCase().includes(query) || 
+                    item.zh.includes(query)
+                );
+            });
+
+            renderList(filtered);
+        };
+
+        renderList(colorData);
+        searchInput.addEventListener('input', handleSearch);
+    });
+</script>
+
+</body>
+</html>
