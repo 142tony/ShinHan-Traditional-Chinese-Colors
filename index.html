@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShinHan 國畫顏料色卡表 - 垂直卡片版 (含容錯優化)</title>
+    <title>ShinHan 國畫顏料色卡表 - 響應式雙欄版</title>
     <style>
         /* --- CSS Reset & Variables --- */
         :root {
@@ -13,7 +13,6 @@
             --accent-color: #333;
             --container-width: 1280px; 
             --card-width: 400px; 
-            --img-height: 100px;
             --gap-size: 20px;
         }
 
@@ -53,9 +52,7 @@
             font-size: 1.8rem;
             font-weight: 600;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin: 0;
         }
 
         .search-wrapper {
@@ -110,21 +107,23 @@
 
         .color-grid {
             display: grid;
+            /* 預設桌面版：3欄固定寬度 */
             grid-template-columns: repeat(3, var(--card-width)); 
             gap: var(--gap-size);
             justify-content: center;
         }
 
-        /* --- Color Card Component (Vertical) --- */
+        /* --- Color Card Component --- */
         .color-card {
             background: #ffffff;
             border-radius: 12px;
-            /* 關鍵：因為子元素放大了，必須透過 overflow: hidden 來裁切多餘邊緣 */
             overflow: hidden; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column; 
+            /* 讓卡片在Grid中自動填滿高度，確保同一列卡片等高 */
+            height: 100%;
         }
 
         .color-card:hover {
@@ -132,18 +131,21 @@
             box-shadow: 0 12px 24px rgba(0,0,0,0.12);
         }
 
-        /* 上半部：雪碧圖顯示區 */
+        /* 上半部：雪碧圖顯示區 (核心修改) */
         .card-visual {
             width: 100%;
-            height: var(--img-height);
+            /* 使用 aspect-ratio 鎖定 4:1 比例 (400px:100px) */
+            aspect-ratio: 4 / 1; 
             background-image: url('新韓 國畫顏料.jpg');
             background-repeat: no-repeat;
+            
+            /* 雪碧圖總寬是單格的3倍，總高是單格的7倍。
+               設定百分比後，無論容器寬度為何，圖片都會等比例縮放。
+            */
+            background-size: 300% 700%; 
             border-bottom: 1px solid #f0f0f0;
 
-            /* --- 核心修改：2% 放大容錯 --- */
-            /* 使用 transform: scale(1.02) 是處理雪碧圖公差最高效的方法，
-               它不會破壞 background-position 的像素計算邏輯，
-               但能有效裁切掉圖片四周 1% 的潛在白邊或鄰近色塊。 */
+            /* 2% 放大容錯，解決白邊問題 */
             transform: scale(1.02);
             transform-origin: center center;
         }
@@ -154,10 +156,10 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            /* 確保內容層級在背景之上（雖然這裡是垂直排列，預防性設置） */
             position: relative; 
             z-index: 2;
             background: #fff;
+            flex-grow: 1; /* 確保文字少時下方空間填滿 */
         }
 
         .info-header {
@@ -181,6 +183,7 @@
             padding: 4px 8px;
             border-radius: 6px;
             text-transform: uppercase;
+            white-space: nowrap; /* 防止群組名稱換行 */
         }
 
         .info-names {
@@ -202,7 +205,7 @@
             text-transform: uppercase;
         }
 
-        /* --- Utility & Responsive --- */
+        /* --- Utility --- */
         .no-results {
             grid-column: 1 / -1;
             padding: 80px;
@@ -211,22 +214,55 @@
             border-radius: 12px;
             color: #666;
             font-size: 1.2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        @media (max-width: 1300px) {
+        /* --- Responsive Design (Mobile Optimization) --- */
+        /* 當寬度小於 900px 時 (涵蓋平板與手機) */
+        @media (max-width: 900px) {
+            body {
+                padding: 20px 10px; /* 減少外部間距 */
+            }
+
+            header {
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .search-wrapper {
+                max-width: 100%; /* 搜尋框滿寬 */
+            }
+
+            /* --- 手機版雙欄核心設定 --- */
             .color-grid {
-                grid-template-columns: repeat(auto-fit, var(--card-width));
+                /* 強制改為 2 欄，比例 1:1，自動填滿 */
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px; /* 縮小卡片間距 */
             }
-        }
 
-        @media (max-width: 450px) {
-            :root {
-                --card-width: 100%; 
+            .card-info {
+                padding: 10px 12px; /* 縮小內部間距 */
+                gap: 4px;
             }
-            .color-card {
-                max-width: 400px;
-                margin: 0 auto;
+
+            .color-id {
+                font-size: 1.1rem; /* 縮小編號字體 */
+            }
+
+            .color-group {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+            }
+
+            .color-name-zh {
+                font-size: 1rem;
+            }
+
+            .color-name-en {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -237,7 +273,7 @@
         <h1>ShinHan 專家國畫顏料</h1>
         <div class="search-wrapper">
             <div class="search-icon"></div>
-            <input type="text" id="searchInput" class="search-input" placeholder="輸入編號、名稱搜尋...">
+            <input type="text" id="searchInput" class="search-input" placeholder="搜尋編號、名稱...">
         </div>
     </header>
 
@@ -281,19 +317,28 @@
         const gridContainer = document.getElementById('colorGrid');
         const searchInput = document.getElementById('searchInput');
 
-        // Sprite Constants
-        const COLS_PER_ROW = 3;
-        const ITEM_WIDTH = 400; // px
-        const ITEM_HEIGHT = 100; // px
+        // Sprite Config
+        // 總共 3 欄 (Columns) 和 7 列 (Rows)
+        const TOTAL_COLS = 3;
+        const TOTAL_ROWS = 7;
 
         if (!gridContainer || !searchInput) return;
 
+        /**
+         * 計算背景位置 (百分比模式)
+         * 這種算法可以適應任何尺寸的卡片寬度 (Responsive)
+         */
         const getBackgroundPosition = (index) => {
-            const row = Math.floor(index / COLS_PER_ROW);
-            const col = index % COLS_PER_ROW;
-            const x = -(col * ITEM_WIDTH);
-            const y = -(row * ITEM_HEIGHT);
-            return `${x}px ${y}px`;
+            const row = Math.floor(index / TOTAL_COLS);
+            const col = index % TOTAL_COLS;
+            
+            // 計算百分比座標
+            // X: col / (總欄數 - 1) * 100%
+            // Y: row / (總列數 - 1) * 100%
+            const x = (col / (TOTAL_COLS - 1)) * 100;
+            const y = (row / (TOTAL_ROWS - 1)) * 100;
+            
+            return `${x}% ${y}%`;
         };
 
         const renderList = (list) => {
@@ -314,11 +359,11 @@
                 card.className = 'color-card';
                 
                 card.innerHTML = `
-                    <div class="card-visual" style="background-position: ${bgPos};" title="${color.zh} 預覽"></div>
+                    <div class="card-visual" style="background-position: ${bgPos};" title="${color.zh}"></div>
                     <div class="card-info">
                         <div class="info-header">
                             <span class="color-id">${color.id}</span>
-                            <span class="color-group">Group ${color.group}</span>
+                            <span class="color-group">${color.group}</span>
                         </div>
                         <div class="info-names">
                             <div class="color-name-zh">${color.zh}</div>
